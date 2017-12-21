@@ -1,0 +1,26 @@
+{
+  "name": "meituan-back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=dev nodemon  index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zwStar",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "body-parser": "^1.18.2",
+    "connect-mongo": "^2.0.0",
+    "cookie-parser": "^1.4.3",
+    "crypto": "^1.0.1",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "mongoose": "^4.13.7",
+    "node-fetch": "^1.7.3",
+    "request": "^2.83.0"
+  }
+}
