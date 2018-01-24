@@ -29,8 +29,6 @@ class AddressClass extends BaseClass {
                     ip,
                     key: this.tencentkey2,
                 });
-
-               result = JSON.parse(result);
                 //status===0表示请求成功
                 if (result.status == 0) {
                     const cityInfo = {

@@ -10,7 +10,7 @@ import config from './config'
 const app = express();
 
 app.all('*', (req, res, next) => {
-    console.log(req.headers.origin)
+    // console.log('req.headers.origin',req.headers.origin)
     res.header("Access-Control-Allow-Origin", req.headers.origin || '*');
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
@@ -38,7 +38,7 @@ app.use(session({
         maxAge: 365 * 24 * 60 * 60 * 1000,
     },
     store: new MongoStore({
-        url: 'mongodb://123.207.34.129:27017/mt-session'
+        url: 'mongodb://zwStar:adgjmp123@119.29.82.47:27017/mt-session'
     })
 }))
 
@@ -46,7 +46,7 @@ app.use(session({
 router(app);
 
 // app.use(history());
-
+console.log(`service start on ${config.port}`)
 app.listen(config.port);
 
-module.export = app;
+module.exports = app;

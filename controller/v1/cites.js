@@ -10,25 +10,24 @@ class Cites extends BaseClass {
         this.suggestion = this.suggestion.bind(this);
         this.location = this.location.bind(this);
     }
-
+    //输入地址关键词找位置
     async suggestion(req, res, next) {
-        let query = req.query;
+        let {keyword} = req.query;
         let reqData = {
-            keyword: encodeURI(query.location),
+            keyword: encodeURI(keyword),
             key: this.tencentkey2,
             policy: 1
         }
         let data = await this.fetch('http://apis.map.qq.com/ws/place/v1/suggestion', reqData, "GET");
         res.send({
-                status: 200,
+                status: 1,
                 message: "获取位置信息成功",
                 data: data
             }
         )
     }
-
+    //定位当前位置
     async location(req,res,next){
-
         let ip = req.ip;
         const ipArr = ip.split(':');
         ip = ipArr[ipArr.length -1];
@@ -54,10 +53,14 @@ class Cites extends BaseClass {
                     key:this.tencentkey
                 }, 'GET');
                let address =  cityInfo.result.address.replace('广东省','');
+               let data = {         //返回前端的数据
+                   address,
+                   location
+               }
                 res.send({
-                        status: 200,
+                        status: 1,
                         message: "获取位置信息成功",
-                        address: address
+                        data
                     }
                 )
             }else{
@@ -65,6 +68,10 @@ class Cites extends BaseClass {
             }
         }catch(err){
             console.log(err);
+            res.send({
+                status:-1,
+                message:'定位失败'
+            })
         }
     }
 }

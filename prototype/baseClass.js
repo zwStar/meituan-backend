@@ -1,12 +1,13 @@
 import fetch from 'node-fetch';
 import Ids from '../models/ids'
 
-export default class BaseClass{
-    constructor(){
-        this.idList = ['restaurant_id', 'food_id', 'order_id', 'user_id', 'address_id', 'cart_id', 'img_id', 'category_id', 'item_id', 'sku_id', 'admin_id', 'statis_id','shopping_cart_id'];
+export default class BaseClass {
+    constructor() {
+        this.mutext = 1;
+        this.idList = ['restaurant_id', 'food_id', 'order_id', 'user_id', 'address_id', 'cart_id', 'img_id', 'category_id', 'item_id', 'sku_id', 'admin_id', 'statis_id', 'shopping_cart_id'];
     }
 
-    async fetch(url = '', data = {}, type = 'GET', resType = 'JSON'){
+    async fetch(url = '', data = {}, type = 'GET', resType = 'JSON') {
         type = type.toUpperCase();
         resType = resType.toUpperCase();
         if (type == 'GET') {
@@ -36,10 +37,11 @@ export default class BaseClass{
         }
         let responseJson;
         try {
+            //url = 'http://apis.map.qq.com/ws/distance/v1/?mode=driving&from=39.983171,116.308479&to=39.996060,116.353455;39.949227,116.394310&key=RLHBZ-WMPRP-Q3JDS-V2IQA-JNRFH-EJBHL'
             const response = await fetch(url, requestConfig);
             if (resType === 'TEXT') {
                 responseJson = await response.text();
-            }else{
+            } else {
                 responseJson = await response.json();
             }
         } catch (err) {
@@ -50,19 +52,16 @@ export default class BaseClass{
     }
 
     //获取id列表
-    async getId(type){
-        if (!this.idList.includes(type)) {
+    async getId(type_id) {
+        if (!this.idList.includes(type_id)) {
             console.log('id类型错误');
             throw new Error('id类型错误');
             return
         }
-        try{
-            const idData = await Ids.findOne(); //获取当前Ids数据
-            if(idData[type] === undefined) idData[type] = 0;
-            idData[type] ++ ;                     //修改数据
-            await idData.save();                //保存数据
-            return idData[type];                //返回当前类型id数量
-        }catch (err){
+        try {
+            const idData = await Ids.findOneAndUpdate({}, {'$inc': {[type_id]: 1}});
+            return ++idData[type_id];                //返回当前类型id数量*/
+        } catch (err) {
             console.log('获取ID数据失败');
             throw new Error(err)
         }

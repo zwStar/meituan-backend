@@ -13,7 +13,9 @@ const idsSchema = new mongoose.Schema({
     sku_id: Number,
     admin_id: Number,           //管理员id
     statis_id: Number,
-    shopping_cart_id:Number
+    shopping_cart_id:Number,
+    pay_id:Number,           //支付id
+    comment_id:Number       //评价id
 });
 
 const Ids = mongoose.model('Ids', idsSchema);

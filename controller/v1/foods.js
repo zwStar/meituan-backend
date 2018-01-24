@@ -1,87 +1,139 @@
-import restaurantModel from '../../models/v1/restaurant'
-import foodSpuTagsModel from '../../models/v1/food_spu_tags'
-import foodSpuModel from '../../models/v1/food_spu'
-import foodSpuSkuModel from '../../models/v1/food_spu_sku'
-
+import FoodModel from '../../models/v1/foods'
+import CategoryModel from '../../models/v1/category'
 import BaseClass from "../../prototype/baseClass";
 
 class Foods extends BaseClass {
     constructor() {
         super();
-        this.getRestaurant = this.getRestaurant.bind(this);
+        this.addCategory = this.addCategory.bind(this);
+        this.addFood = this.addFood.bind(this);
     }
 
-    //获取指定id的商家
-    async getRestaurant(req, res, next) {
-        let {restaurant_id} = req.query;
+    //添加食物分类
+    async addCategory(req, res, next) {
+        //category_name 餐馆名 restaurant_id 餐馆id
+        let {category_name, restaurant_id, icon} = req.body;
         try {
-            let restaurant_data = await restaurantModel.findOne({id: restaurant_id})
-
-            let data = {};
-
-            let {
-                id, name, shipping_time, shipping_fee, avg_delivery_time, min_price, bulletin, discounts2, app_delivery_tip, wm_poi_score, poi_back_pic_url, pic_url,
-                shipping_fee_tip, min_price_tip, delivery_time_tip
-            } = restaurant_data;
-            let poi_info = {
-                id,
-                name,
-                shipping_time,
-                shipping_fee,
-                avg_delivery_time,
-                min_price,
-                bulletin,
-                discounts2,
-                app_delivery_tip,
-                wm_poi_score,
-                poi_back_pic_url,
-                pic_url,
-                shipping_fee_tip,
-                min_price_tip,
-                delivery_time_tip
-            };
-            data['poi_info'] = poi_info;        //店家信息
-            data['food_spu_tags'] = [];     //商品列表
-            let tags = await foodSpuTagsModel.find({restaurant_id});    //找到该商店所有分类信息
-            for(let i=0;i<tags.length;i++){
-                data['food_spu_tags'][i] = {...tags[i]._doc,spus:[]}    //每一个大类 添加spus属性 因为返回的tags带有mongodb_key 所以要用 ._doc获取关键字
-
-                let spus = await foodSpuModel.find({food_spu_sku_tags_id: tags[i].id}); //在每一个大类中 找到该类下所有商品
-                data['food_spu_tags'][i]['spus'] = [];
-                for(let j = 0;j<spus.length;j++){
-                    data['food_spu_tags'][i]['spus'][j] = {...spus[j]._doc,skus:[]}; //每一件商品添加规格skus这个关键字
-                    let skus = await foodSpuSkuModel.find({spu_id: spus[j].id}) //找出该商品的所有规格
-                    for(let k=0;k<skus.length;k++){
-                        data['food_spu_tags'][i]['spus'][j]['skus'][k] = {...skus[k]._doc}; //循环规格数组  添加到skus数组中
-                    }
-                }
-            }
-            if (restaurant_data) {
-                res.send({
-                    status: 1,
-                    data
-                })
+            if (!category_name || !restaurant_id) {
+                throw new Error('添加食物分类失败')
             }
         } catch (err) {
-            console.log(`获取id为${restaurant_id}的商家失败`, err);
+            console.log('添加食物分类失败,参数有误', err);
             res.send({
                 status: -1,
-                message: `获取id为${restaurant_id}的商家失败`
+                message: err.message
+            })
+            return;
+        }
+        let category_id = await this.getId('category_id');
+        let category_data = {
+            id: category_id,
+            name: category_name,
+            restaurant_id,
+            icon,
+            spus: []
+        }
+        // console.log('category_id',category_id)
+        try {
+            let category = await new CategoryModel(category_data);
+            await category.save();
+            res.send({
+                status: 1,
+                message: '添加分类成功',
+                category_id
+            })
+        } catch (err) {
+            console.log('添加分类失败', err)
+            res.send({
+                status: -1,
+                message: '添加分类失败'
             })
         }
     }
 
-    //获取多个商家信息
-    async getRestaurants(req, res, next) {
-        let query = req.query;
-        let pageNum = query.pageNum || 0;
-        let limit = query.limit || 10;
-        let sort = query.sort || '';
-        let data = await restaurantModel.find({}).limit(limit)
-        res.send({
-            status: 1,
-            data
-        })
+    //添加食物
+    async addFood(req, res, next) {
+        let {restaurant_id, category_id, food_name, min_price, description, picture, skus} = req.body;
+        try {
+            if (!restaurant_id || !category_id || !food_name) {
+                throw new Error('添加食物失败，参数有误!');
+            }
+        } catch (err) {
+            res.send({
+                status: -1,
+                message: err.message
+            })
+            return;
+        }
+        try {
+            for (let i = 0; i < skus.length; i++) {
+                let sku_id = await this.getId('sku_id');
+                skus[i]['id'] = sku_id;
+            }
+            let month_saled = Math.ceil(Math.random() * 50);  //随机生成一个月售数量
+            let food_id = await this.getId('food_id');
+            let food_data = {
+                id: food_id,
+                restaurant_id,
+                category_id,
+                name: food_name,
+                praise_num: Math.ceil(Math.random() * 50),      //点赞数量
+                praise_content: '好吃',    //点赞内容
+                month_saled,
+                month_saled_content: `${month_saled}`,
+                min_price,
+                description,
+                picture,
+                skus
+            }
+            let food = new FoodModel(food_data);
+            let addFoods = await food.save();
+            let category = await CategoryModel.findOne({id: category_id});
+            let updateCategory = category.spus.push(addFoods._id);
+            await category.save();
+            res.send({
+                status: 1,
+                message: '添加食物成功',
+                food_id
+            })
+        } catch (err) {
+            console.log('添加食物失败', err);
+            res.send({
+                status: -1,
+                message: '添加食物失败'
+            })
+        }
+    }
+
+    //删除食物
+    async delete_food(req, res, next) {
+        console.log(req.body)
+        let {food_id} = req.body;
+        try {
+            if (!food_id)
+                throw new Error('删除食物失败，参数有误')
+        } catch (err) {
+            console.log('删除食物失败，参数有误', err)
+            return;
+        }
+       try{
+           let food =await FoodModel.findOne({id:food_id});
+           // let category = await CategoryModel.findOne({id:food.category_id});
+           // let data = category.spus(food._id);
+           let category = await CategoryModel.update({id:food.category_id},{$pull:{spus:food._id}});
+           await food.remove()
+           res.send({
+               status:1,
+               message:'删除食物成功'
+           })
+       }catch(err){
+            console.log('删除食物失败');
+            res.send({
+                status:-1,
+                message:'删除食物失败'
+            })
+       }
+
     }
 }
 

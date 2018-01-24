@@ -10,13 +10,12 @@ const addressSchema = new Schema({
     created_at: {type: Date, default: Date.now()},
     address: String,
     address_detail: String,
-    gender: {String},
+    gender: String,
     province: String,
     city: String,
     district: String,
-    house_number: String,
-    longitude: String,
-    latitude: String
+    lng: String,
+    lat: String
 })
 /*    "gd_addr_type": "",
     "is_default": 0,

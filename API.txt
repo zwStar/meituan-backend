@@ -1,0 +1,43 @@
+# meituan-backend 接口文档
+## 目录：
+
+[1、登录](#1登录)<br/>
+## 接口列表：
+
+### 1、登录
+
+#### 请求URL:  
+```
+/admin/login
+```
+
+#### 示例：
+ [http://cangdu.org:8001/admin/login]
+
+#### 请求方式: 
+```
+POST
+```
+
+#### 参数类型：query
+
+|参数|是否必选|类型|说明|
+|:-----|:-------:|:-----|:-----|
+|username      |Y       |string  |用户名 |
+|password      |Y       |string  |密码 |
+
+#### 返回示例：
+
+```javascript
+{
+  id: 1,
+  name: "上海",
+  abbr: "SH",
+  area_code: "021",
+  sort: 1,
+  latitude: 31.23037,
+  longitude: 121.473701,
+  is_map: true,
+  pinyin: "shanghai"
+}
+```
