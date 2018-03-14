@@ -4,7 +4,7 @@ import Ids from '../models/ids'
 export default class BaseClass {
     constructor() {
         this.mutext = 1;
-        this.idList = ['restaurant_id', 'food_id', 'order_id', 'user_id', 'address_id', 'cart_id', 'img_id', 'category_id', 'item_id', 'sku_id', 'admin_id', 'statis_id', 'shopping_cart_id'];
+        this.idList = ['restaurant_id', 'food_id', 'order_id', 'user_id', 'address_id', 'cart_id', 'img_id', 'category_id', 'item_id', 'sku_id', 'admin_id', 'statis_id', 'shopping_cart_id','pay_id','comment_id'];
     }
 
     async fetch(url = '', data = {}, type = 'GET', resType = 'JSON') {
@@ -37,7 +37,6 @@ export default class BaseClass {
         }
         let responseJson;
         try {
-            //url = 'http://apis.map.qq.com/ws/distance/v1/?mode=driving&from=39.983171,116.308479&to=39.996060,116.353455;39.949227,116.394310&key=RLHBZ-WMPRP-Q3JDS-V2IQA-JNRFH-EJBHL'
             const response = await fetch(url, requestConfig);
             if (resType === 'TEXT') {
                 responseJson = await response.text();

@@ -53,7 +53,7 @@ class Foods extends BaseClass {
 
     //添加食物
     async addFood(req, res, next) {
-        let {restaurant_id, category_id, food_name, min_price, description, picture, skus} = req.body;
+        let {restaurant_id, category_id, food_name, min_price, description, pic_url, skus,month_saled,month_saled_content} = req.body;
         try {
             if (!restaurant_id || !category_id || !food_name) {
                 throw new Error('添加食物失败，参数有误!');
@@ -83,7 +83,7 @@ class Foods extends BaseClass {
                 month_saled_content: `${month_saled}`,
                 min_price,
                 description,
-                picture,
+                pic_url,
                 skus
             }
             let food = new FoodModel(food_data);
@@ -106,9 +106,8 @@ class Foods extends BaseClass {
     }
 
     //删除食物
-    async delete_food(req, res, next) {
-        console.log(req.body)
-        let {food_id} = req.body;
+    async deleteFood(req, res, next) {
+        let food_id = req.params.food_id;
         try {
             if (!food_id)
                 throw new Error('删除食物失败，参数有误')

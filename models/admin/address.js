@@ -15,7 +15,8 @@ const addressSchema = new Schema({
     city: String,
     district: String,
     lng: String,
-    lat: String
+    lat: String,
+    house_number:String     //门牌号
 })
 /*    "gd_addr_type": "",
     "is_default": 0,

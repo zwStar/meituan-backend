@@ -15,7 +15,7 @@ const foodsSchema = new mongoose.Schema({
     praise_num_new: Number,
     unit: String,
     description: String,       //描述
-    picture: String,            //图片
+    pic_url: String,            //图片
     month_saled: Number,        //月售数量
     month_saled_content: String,    // 月售描述
     status: Number,

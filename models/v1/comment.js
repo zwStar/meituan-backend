@@ -5,15 +5,15 @@ const Schema = mongoose.Schema;
 const commentSchema = new Schema({
     id: Number,			//id
     user_id: Number,     //用户id
-    user_name:Number,   //用户名
-    avatar:String,          //头像
+    user_name:String,   //用户名
+        avatar:String,          //头像
     restaurant_id:Number,
     comment_time:{type:Date,default:new Date()},
     add_comment_list:[{
         content:String,
         time:{type:Date,default:new Date()}
     }],
-    comment:String,
+    comment_data:String,
     order_id:Number,
     name:String,
     food_score:Number,

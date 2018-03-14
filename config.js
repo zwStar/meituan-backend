@@ -1,5 +1,8 @@
 module.exports = {
-    port: 3000
+    port: 3000,
+    Bucket:'meituan',
+    AccessKey:'FHE4n02irVv87MUjy6v3NRCTdxSF7Oz3NwFT7Cop',
+    SecretKey:'Q4MaTDMpFFjNIS8kuXV-_b4l05pOTMULztnOD4Bx'
 }
 let data = {
     "tag": "100",

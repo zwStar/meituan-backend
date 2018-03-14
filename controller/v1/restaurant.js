@@ -1,6 +1,6 @@
 import RestaurantModel from '../../models/v1/restaurant'
 import BaseClass from "../../prototype/baseClass";
-import Category from '../../models/v1/category'     //食物左侧分类
+import CategoryModel from '../../models/v1/category'     //食物左侧分类
 class Restaurant extends BaseClass {
     constructor() {
         super();
@@ -8,12 +8,13 @@ class Restaurant extends BaseClass {
         this.getRestaurants = this.getRestaurants.bind(this);
         this.tencentkey = 'RLHBZ-WMPRP-Q3JDS-V2IQA-JNRFH-EJBHL';
         this.tencentkey2 = 'RRXBZ-WC6KF-ZQSJT-N2QU7-T5QIT-6KF5X';
+        this.gaode_key = 'bb0667770abae0b69c421bb49437a27e';
     }
 
     async addRestaurant(req, res, next) {
         //添加餐厅
-        let {name, third_category, pic_url, shopping_time_start, shopping_time_end, min_price, shipping_fee, bulletin, address, call_center} = req.body;
-
+        console.log('req.body', req.body);
+        let {name, third_category, pic_url, shopping_time_start, shopping_time_end, min_price, shipping_fee, bulletin, address, call_center, lng, lat} = req.body;
         try {
             if (!name || !third_category || !pic_url || !address || !call_center) {
                 throw new Error('必须填写食品类型名称');
@@ -39,6 +40,7 @@ class Restaurant extends BaseClass {
             delivery_score: (Math.random() * 5).toFixed(1),      //随机生成评分数
             quality_score: (Math.random() * 5).toFixed(1),      //随机生成评分数
             pack_score: (Math.random() * 5).toFixed(1),      //随机生成评分数
+            food_score: (Math.random() * 5).toFixed(1),      //随机生成评分数
             delivery_time_tip: '50分钟',
             third_category,
             pic_url,
@@ -71,6 +73,8 @@ class Restaurant extends BaseClass {
                     "info": "新用户立减2元,首次使用银行卡支付最高再减3元"
                 }
             ],
+            lng,
+            lat
         }
 
         let newRestaurant = new RestaurantModel(restaurant_data);
@@ -99,17 +103,18 @@ class Restaurant extends BaseClass {
                 throw new Error('获取餐馆列表失败，参数有误');
         }
         catch (err) {
-            console.log('获取餐馆列表失败,参数有误', err);
+            console.log(err.message, err);
             res.send({
                 status: -1,
                 message: err.message
             })
+            return;
         }
         try {
             let restaurants = '';   //餐馆信息
             if (sort_type === 'min_price' || sort_type === 'wm_poi_score' || sort_type === 'shipping_fee') {
                 restaurants = await RestaurantModel.find({}).limit(Number(limit)).skip(Number(offset)).sort({sort_type: 1});
-                restaurants = await this.get_distance(restaurants, lng, lat);
+                restaurants = await this.getDistance(restaurants, lng, lat);
                 res.send({
                     status: 1,
                     message: '获取餐馆列表成功',
@@ -118,7 +123,7 @@ class Restaurant extends BaseClass {
             }
             else {
                 restaurants = await RestaurantModel.find({}).limit(Number(limit)).skip(Number(offset));
-                restaurants = await this.get_distance(restaurants);
+                restaurants = await this.getDistance(restaurants, lng, lat);
                 /*根据距离重新排序*/
                 res.send({
                     status: 1,
@@ -136,33 +141,29 @@ class Restaurant extends BaseClass {
     }
 
     //获取餐馆信息时计算距离
-    async get_distance(restaurants, lng, lat) {
+    async getDistance(restaurants, lng, lat) {
         for (let i = 0; i < restaurants.length; i++) {
             let result = null;
-            result = await this.fetch('http://apis.map.qq.com/ws/distance/v1/', {
-                from: `${lat},${lng}`,
-                to: `${restaurants[i].lat},${restaurants[i].lng}`,
-                key: this.tencentkey,
+            result = await this.fetch('http://restapi.amap.com/v3/direction/driving', {
+                origin: `${lng},${lat}`,
+                destination: `${restaurants[i].lng},${restaurants[i].lat}`,
+                key: this.gaode_key
             });
-            if (result.status !== 0) {
-                result = await this.fetch('http://apis.map.qq.com/ws/distance/v1/', {
-                    from: `${lat},${lng}`,
-                    to: `${restaurants[i].lat},${restaurants[i].lng}`,
-                    key: this.tencentkey2,
-                });
+            if (result.status != 1) {
+                restaurants[i].distance = '10km';
+                restaurants[i].delivery_time_tip = '50分钟';
+            } else {
+                let element = result['route']['paths'][0];
+                restaurants[i].distance = (element.distance / 1000 ).toFixed(1) + 'km'        //计算距离
+                restaurants[i].delivery_time_tip = (element.duration / 60).toFixed(1) + '分钟'
             }
-            let element = result.result.elements[0];
-            let distance = (element.distance / 1000 ).toFixed(1)+ 'km'        //计算距离
-            let delivery_time_tip = (element.duration / 60).toFixed(1) + '分钟'
-            restaurants[i].distance = distance;
-            restaurants[i].delivery_time_tip=delivery_time_tip;
         }
         return restaurants;
     }
 
     //根据id获取指定餐馆信息
     async getRestaurant(req, res, next) {
-        let {restaurant_id} = req.query;
+        const restaurant_id = req.params.restaurant_id;
         try {
             if (!restaurant_id) {
                 throw new Error('请指定餐馆id');
@@ -191,20 +192,21 @@ class Restaurant extends BaseClass {
 
     //获取食物列表
     async getFoods(req, res, next) {
-        let {restaurant_id} = req.query;
+        const restaurant_id = req.params.restaurant_id;
         try {
             if (!restaurant_id) {
-                throw new Error('请指定餐馆id');
+                throw new Error('获取食物失败，参数有误');
             }
         } catch (err) {
-            console.log('获取指定餐馆失败，参数有误', err)
+            console.log(err.message, err);
             res.send({
                 status: -1,
                 message: err.message
             })
+            return;
         }
         try {
-            let foods = await Category.find({restaurant_id}).populate({
+            let foods = await CategoryModel.find({restaurant_id}).populate({
                 path: 'spus',
             });
             res.send({
@@ -216,13 +218,13 @@ class Restaurant extends BaseClass {
             console.log('获取餐馆食物失败', err);
             res.send({
                 status: -1,
-                message: err.message
+                message: '获取餐馆食物失败'
             })
         }
     }
 
     //根据关键词搜索商家
-    async search_restaurant(req, res, next) {
+    async searchRestaurant(req, res, next) {
         let {keyword} = req.query;
         try {
             if (!keyword)
@@ -235,11 +237,11 @@ class Restaurant extends BaseClass {
             })
         }
         try {
-            let restaurant = await RestaurantModel.find({name:{$regex: keyword, $options: 'i'}});
+            let restaurant = await RestaurantModel.find({name: {$regex: keyword, $options: 'i'}});
             res.send({
                 status: 1,
                 data: restaurant,
-                message:'搜索餐馆成功'
+                message: '搜索餐馆成功'
             })
         } catch (err) {
             console.log('搜索餐馆失败', err);
@@ -249,6 +251,58 @@ class Restaurant extends BaseClass {
             })
         }
     }
+
+    //获取我的餐馆
+    async myRestaurant(req, res, next) {
+        let {limit=10,offset=0} = req.query;
+        try {
+            let restaurant = await RestaurantModel.find({}).limit(limit).skip(limit * offset);
+            res.send({
+                status: 1,
+                data: restaurant,
+                message: '获取我的餐馆成功'
+            })
+        } catch (err) {
+            console.log('获取我的餐馆失败', err);
+            res.send({
+                status: -1,
+                message: '获取我的餐馆失败'
+            })
+        }
+    }
+
+    //获取指定餐馆食物分类
+    async getCategory(req, res, next) {
+        const restaurant_id = req.params.restaurant_id;
+        try {
+            if (!restaurant_id)
+                throw new Error('获取餐馆类型失败,参数有误')
+        }
+        catch (err) {
+            console.log('获取餐馆类型失败', err);
+            res.send({
+                status: -1,
+                message: err.message
+            })
+            return;
+        }
+        try {
+            let category = await CategoryModel.find({restaurant_id});
+            res.send({
+                status: 1,
+                data: category,
+                message: '获取餐馆类型成功'
+            })
+        } catch (err) {
+            console.log('获取餐馆类型失败', err);
+            res.send({
+                status: -1,
+                message: '获取餐馆类型失败'
+            })
+        }
+    }
+
+
 }
 
 export default new Restaurant();

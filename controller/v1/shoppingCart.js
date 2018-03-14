@@ -8,12 +8,12 @@ import RestaurantModel from '../../models/v1/restaurant'
 class ShoppingCart extends BaseClass {
     constructor() {
         super();
-        this.add_shopping_cart = this.add_shopping_cart.bind(this)
-        this.reduce_shopping_cart = this.reduce_shopping_cart.bind(this)
+        this.addShoppingCart = this.addShoppingCart.bind(this)
+        this.reduceShoppingCart = this.reduceShoppingCart.bind(this)
     }
 
     //添加进购物车
-    async add_shopping_cart(req, res, next) {
+    async addShoppingCart(req, res, next) {
         let {food_id, sku_id} = req.body;
         try {
             let isExit = await ShoppingCartModel.findOne({sku_id}); //看是否已经存在购物车 如果存在 直接数量加一
@@ -54,7 +54,7 @@ class ShoppingCart extends BaseClass {
     }
 
     //减少购物车商品
-    async reduce_shopping_cart(req, res, next) {
+    async reduceShoppingCart(req, res, next) {
         //如果传restaurant_id表示删除这间店的食物        传sku_id删除某个食物
         let {restaurant_id, sku_id} = req.body;
         try {
@@ -113,7 +113,7 @@ class ShoppingCart extends BaseClass {
     }
 
     //获取购物车信息
-    async shopping_cart(req, res, next) {
+    async shoppingCart(req, res, next) {
         //如果没有传restaurant_id 就默认获取全部购物车
         let {restaurant_id} = req.query;
         if (restaurant_id) {

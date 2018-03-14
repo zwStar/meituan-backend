@@ -1,44 +1,48 @@
 import express from 'express'
 import Cites from '../controller/v1/cites'
-import Foods from '../controller/v1/foods'
-import Admin from '../controller/admin/admin'
-import ShoppingCart from '../controller/v1/shoppingCart'
 import Restaurant from '../controller/v1/restaurant'
+import ShoppingCart from '../controller/v1/shoppingCart'
 import Order from '../controller/v1/order'
 import Comment from '../controller/v1/comment'
-const router = express.Router();
+import Foods from '../controller/v1/foods'
+import Pay from '../controller/v1/pay'
+import Auth from '../prototype/authClass'
 
-router.get("/suggestion",Cites.suggestion)                //地址位置搜索
-router.get("/location",Cites.location);                  //定位
-router.get('/restaurants',Restaurant.getRestaurants);        //获取多家餐馆
-router.get('/restaurant',Restaurant.getRestaurant);          //获取指定餐馆信息
-router.post('/restaurant',Restaurant.addRestaurant);          //添加商家
-router.get('/search_restaurant',Restaurant.search_restaurant);  //搜索商家
-
-router.post('/shopping_cart',ShoppingCart.add_shopping_cart);//添加进购物车
-router.delete("/shopping_cart",ShoppingCart.reduce_shopping_cart);   //减少购物车
-router.get('/shoppingCart',ShoppingCart.shopping_cart);         //获取购物车
+const router = express.Router()
 
 
-router.get('/user_count',Admin.user_count);       //获取当天新增用户数量
-/*router.get('/orderCount',Admin.orderCount);     //获取当天新增订单数量
-*/
+router.get("/suggestion", Cites.suggestion)                //地址位置搜索
+router.get("/location", Cites.location);                  //定位
 
-router.get('/all_user_count',Admin.all_user_count);  //获取所有用户数量
-router.get('/all_order_count',Order.all_order_count);   //获取所有订单数量
+router.post('/cart', ShoppingCart.addShoppingCart);//添加进购物车
+router.delete("/cart", ShoppingCart.reduceShoppingCart);   //减少购物车
+router.get('/cart', ShoppingCart.shoppingCart);         //获取购物车
 
-router.post('/category',Foods.addCategory);         //添加食物分类
-router.post('/food',Foods.addFood)         //添加食物
-router.get('/food',Restaurant.getFoods);         //获取指定餐馆食物列表
-router.delete('/food',Foods.delete_food);      //删除食物
+router.get('/restaurants', Restaurant.getRestaurants);        //获取多家餐馆
+router.get('/restaurant/:restaurant_id', Restaurant.getRestaurant);          //获取指定餐馆信息
+router.post('/restaurant', Restaurant.addRestaurant);          //添加商家
+router.get('/search/restaurant', Restaurant.searchRestaurant);  //搜索商家
+router.get('/my_restaurant', Restaurant.myRestaurant);      //获取我的餐馆
 
-//订单
-router.post('/order',Order.make_order);         //下订单
-router.get('/orders',Order.get_orders);             //获取订单列表
-router.get('/order',Order.get_order);             //获取指定订单
+router.post('/category', Foods.addCategory);         //添加食物分类
+router.get('/category/:restaurant_id', Restaurant.getCategory);    //获取指定餐馆食物分类
+router.post('/food', Foods.addFood)         //添加食物
+router.get('/food/:restaurant_id', Restaurant.getFoods);         //获取指定餐馆食物列表
+router.delete('/food/:food_id', Foods.deleteFood);      //删除食物
 
 //评价
-router.post('/comment',Comment.make_comment)
-router.get('/comment_count',Comment.commen_count);      //获取评论数量
+router.get('/comment/:restaurant_id', Comment.getComment);     //获取餐馆评论
+router.post('/comment', Comment.makeComment);        //评论
+router.get('/comment_count', Comment.commentCount);      //获取评论数量
+router.get('/my_restaurant_comment', Comment.myRestaurantComment);     //获取我的餐馆评论
 
+//订单
+router.post('/order', Auth.authSession, Order.makeOrder);         //下订单
+router.get('/orders', Order.getOrders);             //获取订单列表
+router.get('/order/:order_id', Order.getOrder);             //获取指定订单
+
+//支付
+router.post('/pay', Pay.initPay)                     //初始化支付
+router.post('/notify_url',Pay.payNotice)            //支付异步通知
+router.get('/listen_status',Pay.listenStatus)          //监听扫描结果
 export default router;

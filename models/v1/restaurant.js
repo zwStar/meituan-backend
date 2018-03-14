@@ -12,6 +12,7 @@ const restaurantSchema = new mongoose.Schema({
     wm_poi_score: Number,       //商家评分
     delivery_score:Number,      //配送评分
     quality_score:Number,       //质量评论
+    food_score:Number,           //口味评分
     pack_score:Number,          //包装评分
     distance: String,       //距离
     delivery_time_tip: String,      //送达时间提示
