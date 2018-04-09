@@ -35,7 +35,11 @@
 - Mongoose对MongoDB进行便捷操作
 - 使用Charles抓取数据
 
+
 ## 线上地址 ##
+    http://39.108.3.12
+    请用谷歌浏览器然后开启移动端浏览，如果要调用APP支付就需要用手机自带浏览器打开，然后支付时选择调起APP支付
+
 前端项目地址：>[GitHub：https://github.com/zwStar/vue-meituan](https://github.com/zwStar/vue-meituan)
 
 ## 项目部署
