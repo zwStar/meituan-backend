@@ -7,9 +7,8 @@ class Restaurant extends BaseClass {
         super();
         this.addRestaurant = this.addRestaurant.bind(this);
         this.getRestaurants = this.getRestaurants.bind(this);
-        this.tencentkey = 'RLHBZ-WMPRP-Q3JDS-V2IQA-JNRFH-EJBHL';
-        this.tencentkey2 = 'RRXBZ-WC6KF-ZQSJT-N2QU7-T5QIT-6KF5X';
         this.gaode_key = 'bb0667770abae0b69c421bb49437a27e';
+        this.gaode_key2 = 'b78928526d0ff771b0e29ead73797955'
     }
 
     //添加餐厅

@@ -71,18 +71,6 @@ class Comment extends BaseClass {
         }
     }
 
-    // 后台添加评论
-    async _makeComment(req, res, next) {
-        let comment = req.body.comment;
-        for (var i = 0; i < comment.length; i++) {
-            let comment_data = new CommentModel(comment[i]);
-            await comment_data.save();
-        }
-        res.send({
-            status: 1
-        })
-    }
-
     //获取餐馆评论
     async getComment(req, res, next) {
         let {restaurant_id, offset = 0, limit = 5} = req.query;
