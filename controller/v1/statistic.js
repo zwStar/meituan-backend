@@ -12,18 +12,14 @@ class Statistic {
     //获取全部用户数量
     async allUserCount(req, res, next) {
         let status = req.query.status || 1;
-        let message = status == 1 ? '获取全部用户数量' : '获取全部管理员数量';
+        let message = status === 1 ? '获取全部用户数量' : '获取全部管理员数量';
         try {
             let count = await AdminModel.find({status}).count();
-            if (count >= 0) {
-                res.send({
-                    status: 1,
-                    message: message + '成功',
-                    data: count
-                })
-            } else {
-                throw new Error(message + '失败');
-            }
+            res.send({
+                status: 200,
+                message: message + '成功',
+                data: count
+            })
         } catch (err) {
             console.log(`${message}失败${err}`);
             res.send({
@@ -38,12 +34,12 @@ class Statistic {
         let date = req.query.date ? new Date(req.query.date) : new Date();
         let dateFormat = this.dateFormat(date);
         let status = req.query.status ? req.query.status : 1;
-        let message = status == 1 ? '获取当天新增用户数量成功' : '获取当天新增管理员数量成功';
+        let message = status === 1 ? '获取当天新增用户数量成功' : '获取当天新增管理员数量成功';
 
         try {
             let count = await AdminModel.find({$and: [{create_time: {$gt: dateFormat.today}}, {create_time: {$lt: dateFormat.nextDay}}, {status}]}).count();
             res.send({
-                status: 1,
+                status: 200,
                 message,
                 data: count
             })
@@ -63,7 +59,7 @@ class Statistic {
         try {
             let count = await OrderModel.find({$and: [{create_time: {$gt: dateFormat.today}}, {create_time: {$lt: dateFormat.nextDay}}]}).count();
             res.send({
-                status: 1,
+                status: 200,
                 message: '获取订单数量成功',
                 data: count
             })
@@ -79,9 +75,9 @@ class Statistic {
     //获取所有订单数量
     async allOrderCount(req, res, next) {
         try {
-            let count = await OrderModel.find({status: '支付完成'}).count();
+            let count = await OrderModel.find({code: 200}).count();
             res.send({
-                status: 1,
+                status: 200,
                 message: '获取所有完成订单数量成功',
                 data: count
             })
@@ -95,22 +91,23 @@ class Statistic {
     }
 
     //餐馆数量
-    async restaurantCount(req,res,next){
-        try{
+    async restaurantCount(req, res, next) {
+        try {
             let count = await RestaurantModel.find({}).count();
             res.send({
-                status:1,
-                message:'获取餐馆数量成功',
-                data:count
+                status: 200,
+                message: '获取餐馆数量成功',
+                data: count
             })
-        }catch (err){
+        } catch (err) {
             console.log('获取餐馆数量失败');
             res.send({
-                status:-1,
-                message:'获取餐馆数量失败'
+                status: -1,
+                message: '获取餐馆数量失败'
             })
         }
     }
+
 
     dateFormat(date) {
         let obj = {};

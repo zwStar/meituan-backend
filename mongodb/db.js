@@ -1,24 +1,23 @@
-
 import mongoose from 'mongoose';
+import config from '../config'
 
-
-mongoose.connect('mongodb://zwStar:adgjmp123@119.29.82.47:27017/meituan', {server:{auto_reconnect:true}});
+mongoose.connect(config.DB_URL, {server: {auto_reconnect: true}});
 mongoose.Promise = global.Promise;
 
 const db = mongoose.connection;
 
-db.once('open' ,() => {
-  console.log('连接数据库成功')
+db.once('open', () => {
+    console.log('Connecting to the database Successfully')
 })
 
-db.on('error', function(error) {
-  console.error('Error in MongoDb connection: ' + error);
-  mongoose.disconnect();
+db.on('error', function (error) {
+    console.error('Error in MongoDb connection: ' + error);
+    mongoose.disconnect();
 });
 
-db.on('close', function() {
-  console.log('数据库断开，重新连接数据库');
-  mongoose.connect('mongodb://zwStar:adgjmp123@119.29.82.47:27017/meituan', {server:{auto_reconnect:true}});
+db.on('close', function () {
+    console.log('The database is disconnected and try to reconnect the database');
+    mongoose.connect(config.DB_URL, {server: {auto_reconnect: true}});
 });
 
 export default db;

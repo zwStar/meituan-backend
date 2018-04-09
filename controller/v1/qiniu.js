@@ -1,23 +1,30 @@
 //七牛云上传token
 import Config from '../../config'
 import qiniu from 'qiniu'
+
 class Qiniu {
-    constructor(){
+    constructor() {
         this.uploadToken = this.uploadToken.bind(this);
         this.mac = new qiniu.auth.digest.Mac(Config.AccessKey, Config.SecretKey);
         let options = {
-            scope: Config.Bucket,
-            deleteAfterDays: 7,
+            scope: Config.Bucket
         };
         this.putPolicy = new qiniu.rs.PutPolicy(options);
-        // let bucketManager = new qiniu.rs.BucketManager(mac, null);
     }
-    uploadToken(req,res,next){
+
+    uploadToken(req, res, next) {
         let token = this.putPolicy.uploadToken(this.mac);
         if (token) {
-            res.json({
-                uptoken: token
+            res.send({
+                uptoken: token,
+                message: '获取上传凭证成功',
+                status: 200
             });
+        } else {
+            res.send({
+                status: -1,
+                message: '获取上传凭证失败'
+            })
         }
     }
 }

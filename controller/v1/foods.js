@@ -13,15 +13,10 @@ class Foods extends BaseClass {
     async addCategory(req, res, next) {
         //category_name 餐馆名 restaurant_id 餐馆id
         let {category_name, restaurant_id, icon} = req.body;
-        try {
-            if (!category_name || !restaurant_id) {
-                throw new Error('添加食物分类失败')
-            }
-        } catch (err) {
-            console.log('添加食物分类失败,参数有误', err);
+        if (!category_name || !restaurant_id) {
             res.send({
                 status: -1,
-                message: err.message
+                message: '添加食物分类失败,参数有误'
             })
             return;
         }
@@ -33,12 +28,10 @@ class Foods extends BaseClass {
             icon,
             spus: []
         }
-        // console.log('category_id',category_id)
         try {
-            let category = await new CategoryModel(category_data);
-            await category.save();
+            let category = await new CategoryModel(category_data).save();
             res.send({
-                status: 1,
+                status: 200,
                 message: '添加分类成功',
                 category_id
             })
@@ -53,15 +46,11 @@ class Foods extends BaseClass {
 
     //添加食物
     async addFood(req, res, next) {
-        let {restaurant_id, category_id, food_name, min_price, description, pic_url, skus,month_saled,month_saled_content} = req.body;
-        try {
-            if (!restaurant_id || !category_id || !food_name) {
-                throw new Error('添加食物失败，参数有误!');
-            }
-        } catch (err) {
+        let {restaurant_id, category_id, food_name, min_price, description, pic_url, skus} = req.body;
+        if (!restaurant_id || !category_id || !food_name) {
             res.send({
                 status: -1,
-                message: err.message
+                message: '添加食物失败，参数有误!'
             })
             return;
         }
@@ -78,7 +67,6 @@ class Foods extends BaseClass {
                 category_id,
                 name: food_name,
                 praise_num: Math.ceil(Math.random() * 50),      //点赞数量
-                praise_content: '好吃',    //点赞内容
                 month_saled,
                 month_saled_content: `${month_saled}`,
                 min_price,
@@ -86,13 +74,12 @@ class Foods extends BaseClass {
                 pic_url,
                 skus
             }
-            let food = new FoodModel(food_data);
-            let addFoods = await food.save();
+            let addFoods = new FoodModel(food_data).save();
             let category = await CategoryModel.findOne({id: category_id});
             let updateCategory = category.spus.push(addFoods._id);
             await category.save();
             res.send({
-                status: 1,
+                status: 200,
                 message: '添加食物成功',
                 food_id
             })
@@ -108,31 +95,28 @@ class Foods extends BaseClass {
     //删除食物
     async deleteFood(req, res, next) {
         let food_id = req.params.food_id;
-        try {
-            if (!food_id)
-                throw new Error('删除食物失败，参数有误')
-        } catch (err) {
-            console.log('删除食物失败，参数有误', err)
+        if (!food_id) {
+            res.send({
+                status: -1,
+                message: '删除食物失败，参数有误'
+            })
             return;
         }
-       try{
-           let food =await FoodModel.findOne({id:food_id});
-           // let category = await CategoryModel.findOne({id:food.category_id});
-           // let data = category.spus(food._id);
-           let category = await CategoryModel.update({id:food.category_id},{$pull:{spus:food._id}});
-           await food.remove()
-           res.send({
-               status:1,
-               message:'删除食物成功'
-           })
-       }catch(err){
+        try {
+            let food = await FoodModel.findOne({id: food_id});
+            await CategoryModel.update({id: food.category_id}, {$pull: {spus: food._id}});
+            await food.remove()
+            res.send({
+                status: 200,
+                message: '删除食物成功'
+            })
+        } catch (err) {
             console.log('删除食物失败');
             res.send({
-                status:-1,
-                message:'删除食物失败'
+                status: -1,
+                message: '删除食物失败'
             })
-       }
-
+        }
     }
 }
 
