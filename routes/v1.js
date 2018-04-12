@@ -26,7 +26,6 @@ router.delete('/food/:food_id', Auth.authAdmin, Foods.deleteFood);      //删除
 //评价
 router.get('/comment', Comment.getComment);     //获取餐馆评论
 router.post('/comment', Auth.authUser, Comment.makeComment);        //评论
-router.post('/_comment', Comment._makeComment);      //添加评论
 router.get('/my_comment', Auth.authUser, Comment.myComment);        //获取我的评论
 router.get('/comment_count', Comment.commentCount);      //获取评论数量
 router.get('/my_restaurant_comment', Auth.authAdmin, Comment.myRestaurantComment);     //获取我的餐馆评论
