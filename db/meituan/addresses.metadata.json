@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"meituan.addresses"},{"v":2,"key":{"id":1},"name":"id_1","ns":"meituan.addresses","background":true}]}
