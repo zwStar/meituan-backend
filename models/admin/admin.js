@@ -6,6 +6,7 @@ const adminSchema = new Schema({
     username: String,	//用户名
     password: String,	//密码
     id: Number,			//id
+    openid: String,
     create_time: {
         type: Date,
         default: new Date()
