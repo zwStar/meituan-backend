@@ -26,6 +26,7 @@ const orderSchema = new Schema({
     status: String,
     code: Number,    //支付状态码
     create_time: {type: Date, default: new Date()},    //订单创建时间
+    confirm: {type: Boolean, default: false},
     create_time_timestamp: {type: String},    //订单创建时间戳
     pay_remain_time: String,         //支付剩余时间
     has_comment: {type: Boolean, default: false}            //是否已经评价该订单了

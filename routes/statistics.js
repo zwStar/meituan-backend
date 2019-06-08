@@ -10,4 +10,9 @@ router.get('/all/user', Auth.authAdmin, Statistic.allUserCount);  //获取所有
 router.get('/all/order', Auth.authAdmin, Statistic.allOrderCount);   //获取所有订单数量
 
 router.get('/count/restaurant', Auth.authAdmin, Statistic.restaurantCount);      //餐馆数量
+
+router.get('/my_order', Auth.authAdmin, Statistic.myOrder);
+router.get('/my_order_price', Auth.authAdmin, Statistic.myOrderPrice);
+
+
 export default router;

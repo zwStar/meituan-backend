@@ -5,5 +5,5 @@ import Auth from '../controller/admin/auth'
 const router = express.Router();
 
 //七牛云上次凭证
-router.get('/uploadtoken', Auth.authUser, Qiniu.uploadToken);
+router.get('/uploadtoken', Auth.auth, Qiniu.uploadToken);
 export default router;
