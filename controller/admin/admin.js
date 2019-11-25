@@ -373,7 +373,7 @@ class Admin extends BaseClass {
   //获取用户信息
   async userInfo(req, res, next) {
     try {
-      let user_info = await AdminModel.findOne({id: req.session.admin_id}, 'username id avatar status create_time');
+      let user_info = await AdminModel.findOne({id: req.session.user_id}, 'username id avatar status create_time');
       res.send({
         status: 200,
         data: user_info,
